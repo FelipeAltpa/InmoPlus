@@ -1,11 +1,85 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@layer base {
+    :root {
+        --inmoplus-page: #f8fafc;
+        --inmoplus-ink: #0f172a;
+        --inmoplus-muted: #64748b;
+        --inmoplus-brand: #3b82f6;
+        --inmoplus-active: rgb(191 219 254 / 70%);
+        --inmoplus-hairline: rgb(226 232 240 / 60%);
+    }
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    [x-cloak] {
+        display: none !important;
+    }
+
+    /* Navegador: selección, scroll y foco con la paleta de la marca. */
+    ::selection {
+        background: #b9dfd0;
+        color: #091f1b;
+    }
+
+    html {
+        scrollbar-color: #b9dfd0 transparent;
+    }
+
+    :focus-visible {
+        outline-color: #277a67;
+    }
+
+    /* Titulares con serif editorial en las pantallas públicas y de acceso. */
+    .has-display h1,
+    .has-display h2 {
+        font-family: theme('fontFamily.display');
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        text-wrap: balance;
+    }
+
+    table {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+@layer components {
+    .dt-container input[type="search"],
+    .dt-container select {
+        @apply rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500;
+    }
+
+    .dt-container > .row:not(.dt-layout-table) {
+        @apply mx-0 flex flex-wrap items-center justify-between gap-3;
+    }
+
+    .dt-container .dt-layout-start,
+    .dt-container .dt-layout-end {
+        @apply min-w-0;
+    }
+
+    .dt-container .dt-layout-table {
+        @apply mx-0;
+    }
+
+    .dt-container .dt-length label,
+    .dt-container .dt-search {
+        @apply inline-flex flex-wrap items-center gap-2;
+    }
+
+    .dt-container .dt-search input[type="search"] {
+        @apply max-w-full;
+    }
+
+    @media (max-width: 480px) {
+        .dt-container .dt-layout-start,
+        .dt-container .dt-layout-end {
+            @apply w-full;
+        }
+
+        .dt-container .dt-search input[type="search"] {
+            @apply flex-1;
+        }
+    }
 }
