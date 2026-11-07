@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'rates_service' => [
+        'base_url' => env('RATES_SERVICE_URL', 'http://127.0.0.1:8091'),
+        'token' => env('RATES_SERVICE_TOKEN'),
+    ],
+
+    'frankfurter' => [
+        'base_url' => env('FRANKFURTER_BASE_URL', 'https://api.frankfurter.dev/v2'),
+    ],
+
+    'loan_service' => [
+        'url' => env('LOAN_SERVICE_URL', 'http://127.0.0.1:8092'),
+        'token' => env('LOAN_SERVICE_TOKEN'),
+    ],
+
 ];
