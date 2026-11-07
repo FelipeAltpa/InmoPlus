@@ -1,0 +1,9 @@
+{
+  "name": "inmoplus-rates-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Microservicio interno de tasas de cambio COP para InmoPlus",
+  "scripts": { "start": "node src/server.js" },
+  "engines": { "node": ">=20" }
+}

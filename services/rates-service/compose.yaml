@@ -1,0 +1,11 @@
+services:
+  rates-service:
+    build: .
+    env_file:
+      - .env
+    environment:
+      PORT: 8091
+      FRANKFURTER_BASE_URL: https://api.frankfurter.dev/v2
+    ports:
+      - "8091:8091"
+    restart: unless-stopped
