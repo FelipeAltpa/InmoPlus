@@ -36,6 +36,8 @@ class UserController extends Controller
         $data = $this->validated($request);
         $user = DB::transaction(function () use ($data) {
             $user = User::create($data + ['password' => Str::random(48)]);
+            // Cuenta creada por el admin: el enlace de contraseña ya prueba el correo.
+            $user->markEmailAsVerified();
             if ($user->role === 'client') {
                 Client::create(['user_id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone, 'status' => 'active']);
             }

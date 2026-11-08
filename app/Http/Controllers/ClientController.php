@@ -45,8 +45,9 @@ class ClientController extends Controller
                 'role' => 'client',
                 // New accounts get a random password.
                 'password' => Hash::make(Str::random(64)),
-                'email_verified_at' => now(),
             ]);
+            // email_verified_at no es fillable: create() lo descartaba.
+            $user->markEmailAsVerified();
 
             Client::create([...$validated, 'user_id' => $user->id]);
 
