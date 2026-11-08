@@ -17,7 +17,7 @@ Route::get('/', [PublicController::class, 'index'])->name('home');
 
 require __DIR__.'/auth.php';
 
-Route::middleware(['auth', 'active'])->group(function () {
+Route::middleware(['auth', 'active', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::middleware(['role:admin,agent,client'])->group(function () {
