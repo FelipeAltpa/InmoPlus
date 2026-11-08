@@ -20,7 +20,7 @@ Sistema inmobiliario académico construido con Laravel 12, PHP 8.2 o superior, M
    php artisan jwt:secret
    ```
 
-3. En `.env`, configura `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE=inmoplus`, `DB_USERNAME=root` y la contraseña que configuraste en Laragon. Para probar la recuperación de contraseña configura un SMTP real (por ejemplo Mailtrap: `MAIL_MAILER=smtp`, `MAIL_USERNAME` y `MAIL_PASSWORD`); con el transporte `log` el enlace solo aparece en `storage/logs/laravel.log`.
+3. En `.env`, configura `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE=inmoplus`, `DB_USERNAME=root` y la contraseña que configuraste en Laragon. Para enviar los correos de verificación y de recuperación de contraseña configura Gmail: activa la verificación en dos pasos de la cuenta, crea una [contraseña de aplicación](https://myaccount.google.com/apppasswords) y usa `MAIL_MAILER=smtp`, `MAIL_HOST=smtp.gmail.com`, `MAIL_PORT=587`, `MAIL_USERNAME` y `MAIL_FROM_ADDRESS` con la cuenta y `MAIL_PASSWORD` con la contraseña de aplicación (el bloque comentado está en `.env.example`). Luego ejecuta `php artisan config:clear`. Con el transporte `log` los enlaces solo aparecen en `storage/logs/laravel.log`.
 4. Instala frontend, aplica las migraciones y prepara archivos públicos:
 
    ```bash
@@ -58,7 +58,7 @@ Cambia o elimina estas cuentas (o define `SEED_PASSWORD`) antes de publicar el s
 ## Funciones incluidas
 
 - Landing y catálogo público de inmuebles.
-- Registro, login y recuperación de contraseña por correo (no se exige verificar el correo para entrar).
+- Registro con verificación de correo obligatoria, login y recuperación de contraseña por correo. Las cuentas del seeder y las que crea el administrador ya quedan verificadas.
 - Dashboard con estadísticas, gráfico Chart.js y listados DataTables.
 - CRUD de propiedades, tipos de inmueble y clientes, con permisos por rol.
 - Edición del perfil y carga de imágenes en el disco público.

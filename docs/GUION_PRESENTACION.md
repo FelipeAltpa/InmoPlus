@@ -6,7 +6,7 @@ Cada requisito del profesor aparece una vez, con la ruta donde se muestra.
 
 - [ ] MySQL arriba y base limpia: `php artisan migrate:fresh --seed` (borra datos; solo en local).
 - [ ] `php artisan storage:link` y `npm run build` ejecutados.
-- [ ] `.env` con SMTP real (Mailtrap) para la recuperación de contraseña. Prueba un envío antes.
+- [ ] `.env` con Gmail (contraseña de aplicación) para la verificación y la recuperación de contraseña. Prueba un envío antes y ten abierta la bandeja del correo con el que vas a registrarte.
 - [ ] `composer dev` corriendo en una terminal. Abre <http://127.0.0.1:8000>.
 - [ ] Postman con la colección `docs/InmoPlus.postman_collection.json` importada.
 - [ ] Tres ventanas listas: una normal (admin), una de incógnito (agente), una con Postman.
@@ -22,8 +22,8 @@ Cuentas (clave `password123` o la de `SEED_PASSWORD`):
 |---|---|---|---|
 | 0:00–1:30 | A | Presentación del proyecto, stack (Laravel 12, MySQL, Blade, Tailwind, JWT). Mostrar carpeta de migraciones. | Req. 1 |
 | 1:30–3:00 | A | Landing con propiedades, catálogo con filtros y cambio de moneda. | `/`, `/properties` — Req. 2 |
-| 3:00–4:30 | A | Registro de un cliente nuevo y login. Mostrar que se crea siempre con rol cliente. | `/register`, `/login` — Req. 2 |
-| 4:30–6:00 | A | Recuperación de contraseña: pedir enlace, abrir correo en Mailtrap, restablecer, entrar. | `/forgot-password` — Req. 4 |
+| 3:00–4:30 | A | Registro de un cliente nuevo: llega el correo de verificación, se abre el enlace y entra. Mostrar que se crea siempre con rol cliente y que sin verificar no accede. | `/register`, `/verify-email`, `/login` — Req. 2 |
+| 4:30–6:00 | A | Recuperación de contraseña: pedir enlace, abrir el correo en Gmail, restablecer, entrar. | `/forgot-password` — Req. 4 |
 | 6:00–8:00 | B | Entrar como admin. Dashboard con usuario activo, menú, gráfico por tipo. Cerrar sesión desde el menú del avatar. | `/dashboard` — Req. 5, 6 |
 | 8:00–9:30 | B | CRUD de propiedades: crear con imagen principal y galería, editar, eliminar. Tabla DataTables (buscar, ordenar). | `/dashboard/properties` — Req. 5, 7, 10 |
 | 9:30–10:30 | B | Segunda tabla DataTables y CRUD: tipos de propiedad y clientes. | `/dashboard/property-types`, `/dashboard/clients` — Req. 5, 7 |
@@ -44,6 +44,6 @@ Cierre (los 3, 30 s): layout maestro compartido (`x-app-layout`, `x-guest-layout
 
 ## Si algo falla
 
-- Sin correo: abrir `storage/logs/laravel.log` y copiar el enlace de reset (solo con `MAIL_MAILER=log`).
+- Sin correo: cambiar a `MAIL_MAILER=log`, ejecutar `php artisan config:clear` y copiar el enlace de verificación o de reset desde `storage/logs/laravel.log`.
 - Sin servicio de tasas: el selector de moneda no cambia precios; el resto funciona. No es parte del checklist.
 - Error 500 inesperado: `APP_DEBUG=true` en local muestra la causa; durante la presentación no lo cambies.
