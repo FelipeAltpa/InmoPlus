@@ -1,0 +1,233 @@
+{
+  "info": {
+    "name": "InmoPlus — API REST",
+    "description": "Colección para la API REST de InmoPlus (JWT Bearer Token). Peticiones 01-11 agrupadas: autenticación, consulta pública, creación, actualización, eliminación, logout y casos de seguridad. Variables de colección: base_url, token (se captura automáticamente en Login), property_id y other_property_id (se capturan automáticamente desde la lista de propiedades). Usar cuentas del seeder: admin@inmoplus.com / agente1@inmoplus.com / agente2@inmoplus.com / clientes (rol client) - contraseña password123.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Autenticación",
+      "item": [
+        {
+          "name": "01 - Login (obtener token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  console.log('Token guardado');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"agente1@inmoplus.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"] }
+          },
+          "response": []
+        },
+        {
+          "name": "07 - Logout (revocar token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/logout", "host": ["{{base_url}}"], "path": ["api", "logout"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Consulta de propiedades (público)",
+      "item": [
+        {
+          "name": "02 - Listar propiedades (GET)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const data = json && Array.isArray(json.data) ? json.data : [];",
+                  "if (data.length > 0) {",
+                  "  pm.collectionVariables.set('property_id', String(data[0].id));",
+                  "  console.log('property_id capturado:', data[0].id);",
+                  "}",
+                  "if (data.length > 1) {",
+                  "  pm.collectionVariables.set('other_property_id', String(data[1].id));",
+                  "  console.log('other_property_id capturado:', data[1].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/properties", "host": ["{{base_url}}"], "path": ["api", "properties"] }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Ver propiedad (GET por id)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/properties/{{property_id}}", "host": ["{{base_url}}"], "path": ["api", "properties", "{{property_id}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Creación de propiedad (admin/agent)",
+      "item": [
+        {
+          "name": "04 - Crear propiedad (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Casa de ejemplo\",\n  \"description\": \"Propiedad creada vía API.\",\n  \"address\": \"Av. Principal 123\",\n  \"city\": \"Ciudad de México\",\n  \"neighborhood\": \"Centro\",\n  \"price\": 1500000,\n  \"area\": 120,\n  \"bedrooms\": 3,\n  \"bathrooms\": 2,\n  \"operation_type\": \"venta\",\n  \"status\": \"disponible\",\n  \"property_type_id\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/properties", "host": ["{{base_url}}"], "path": ["api", "properties"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Actualización de propiedad (admin/propietario)",
+      "item": [
+        {
+          "name": "05 - Actualizar propiedad (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Casa de ejemplo (actualizada)\",\n  \"description\": \"Precio ajustado.\",\n  \"address\": \"Av. Principal 123\",\n  \"city\": \"Ciudad de México\",\n  \"price\": 1750000,\n  \"area\": 130,\n  \"bedrooms\": 3,\n  \"bathrooms\": 2,\n  \"operation_type\": \"venta\",\n  \"status\": \"reservado\",\n  \"property_type_id\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/properties/{{property_id}}", "host": ["{{base_url}}"], "path": ["api", "properties", "{{property_id}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Eliminación de propiedad (admin/propietario)",
+      "item": [
+        {
+          "name": "06 - Eliminar propiedad (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/properties/{{property_id}}", "host": ["{{base_url}}"], "path": ["api", "properties", "{{property_id}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Casos de seguridad",
+      "item": [
+        {
+          "name": "08 - Sin token (401 Unauthorized)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sin Token\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/properties", "host": ["{{base_url}}"], "path": ["api", "properties"] }
+          },
+          "response": []
+        },
+        {
+          "name": "09 - Agent sobre propiedad ajena (403 Forbidden)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"No debería poder\",\n  \"price\": 1,\n  \"bedrooms\": 1,\n  \"bathrooms\": 1,\n  \"address\": \"x\",\n  \"city\": \"x\",\n  \"operation_type\": \"venta\",\n  \"status\": \"disponible\",\n  \"property_type_id\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/properties/{{other_property_id}}", "host": ["{{base_url}}"], "path": ["api", "properties", "{{other_property_id}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "10 - Cliente intenta crear (403 Forbidden)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Intento de cliente\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/properties", "host": ["{{base_url}}"], "path": ["api", "properties"] }
+          },
+          "response": []
+        },
+        {
+          "name": "11 - Datos inválidos (422 Unprocessable Content)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"price\": -5,\n  \"operation_type\": \"invalid\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/properties", "host": ["{{base_url}}"], "path": ["api", "properties"] }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "token", "value": "" },
+    { "key": "property_id", "value": "1" },
+    { "key": "other_property_id", "value": "2" }
+  ]
+}

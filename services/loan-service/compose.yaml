@@ -1,0 +1,10 @@
+services:
+  loan-service:
+    build: .
+    env_file:
+      - .env
+    environment:
+      PORT: 8092
+    ports:
+      - "127.0.0.1:8092:8092"
+    restart: unless-stopped
