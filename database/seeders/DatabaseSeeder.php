@@ -8,6 +8,8 @@ use App\Models\PropertyType;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -242,8 +244,9 @@ class DatabaseSeeder extends Seeder
             ],
         ];
 
-        foreach ($properties as $property) {
-            Property::create($property);
+        foreach ($properties as $index => $data) {
+            $property = Property::create($data);
+            $this->attachPhotos($property, $index + 1);
         }
 
         // Clientes de prueba
@@ -397,5 +400,31 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Clientes de prueba: 12 creados (login = email, rol client)');
         $this->command->info('Intereses iniciales: María (2) y José (1) — solo propiedades disponibles');
     }
-}
 
+    /** Copia las fotos de database/seeders/images/{n} al disco público y las enlaza a la propiedad. */
+    private function attachPhotos(Property $property, int $number): void
+    {
+        $folder = database_path("seeders/images/{$number}");
+
+        if (! File::isDirectory($folder)) {
+            return;
+        }
+
+        $files = collect(File::files($folder))
+            ->filter(fn ($file) => in_array(strtolower($file->getExtension()), ['jpg', 'jpeg', 'png', 'webp']))
+            ->sortBy(fn ($file) => $file->getFilename())
+            ->values();
+
+        foreach ($files as $i => $file) {
+            $path = 'properties/seed-'.$property->id.'-'.($i + 1).'.'.strtolower($file->getExtension());
+
+            Storage::disk('public')->put($path, File::get($file->getPathname()));
+
+            if ($i === 0) {
+                $property->update(['main_image' => $path]);
+            } else {
+                $property->galleryImages()->create(['path' => $path]);
+            }
+        }
+    }
+}
