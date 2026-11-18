@@ -1,0 +1,10 @@
+.git
+.env
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+bootstrap/cache/*.php
+services
+tests

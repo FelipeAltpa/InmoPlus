@@ -1,0 +1,10 @@
+{
+	frankenphp
+}
+
+# SERVER_NAME = dominio público (p. ej. inmoplus.eastus.cloudapp.azure.com); Caddy pide el certificado HTTPS solo.
+{$SERVER_NAME:localhost} {
+	root * /app/public
+	encode zstd br gzip
+	php_server
+}
