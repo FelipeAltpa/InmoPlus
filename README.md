@@ -2,6 +2,8 @@
 
 Sistema inmobiliario académico construido con Laravel 12, PHP 8.2 o superior, MySQL, Blade, Tailwind CSS, Alpine.js, DataTables, Chart.js, JWT y DomPDF. Incluye catálogo público, cuentas con roles, panel administrativo, CRUD de propiedades, tipos y clientes, API REST, conversión de precios COP/USD/EUR con Frankfurter, imágenes y reportes PDF.
 
+**Producción:** <https://inmoplus.northcentralus.cloudapp.azure.com> (Swagger en [`/docs/api`](https://inmoplus.northcentralus.cloudapp.azure.com/docs/api)).
+
 ## Requisitos
 
 - Laragon con PHP 8.2+ y MySQL 8+ (en este equipo: PHP 8.3 y MySQL 8.4).
@@ -73,7 +75,42 @@ Cambia o elimina estas cuentas (o define `SEED_PASSWORD`) antes de publicar el s
 
 ## Despliegue
 
-Usa un hosting/VPS que admita Laravel 12, PHP 8.2+, extensiones requeridas y MySQL 8. Configura el document root del servidor web en la carpeta `public`, HTTPS, variables de producción (`APP_ENV=production`, `APP_DEBUG=false`, `APP_KEY` con `php artisan key:generate` y `JWT_SECRET` con `php artisan jwt:secret`), credenciales dedicadas de base de datos y permisos de escritura en `storage` y `bootstrap/cache`. Ejecuta `composer install --no-dev --optimize-autoloader`, `npm ci && npm run build`, `php artisan migrate --force` y `php artisan storage:link`. Configura SMTP para recuperación de contraseña y un cron para `php artisan schedule:run`; si se habilitan colas, configura un worker persistente. No publiques `.env` ni credenciales.
+Producción: <https://inmoplus.northcentralus.cloudapp.azure.com>
+
+Corre en una máquina virtual de Azure (Ubuntu 24.04, 1 GB de RAM + 2 GB de swap) con Docker Compose (`compose.prod.yaml`). Contenedores:
+
+- `app`: Laravel servido por FrankenPHP, con HTTPS automático de Let's Encrypt.
+- `mysql`: MySQL 8.4.
+- `rates-service` y `loan-service`.
+
+Al arrancar, `app` ejecuta `php artisan migrate --force` y `php artisan optimize`. La base de datos, las imágenes subidas y los certificados viven en volúmenes Docker, así que se conservan entre actualizaciones.
+
+Primera instalación en un servidor con Docker:
+
+```bash
+cp .env.example .env    # completar con los valores de producción (ver abajo)
+docker compose -f compose.prod.yaml up -d --build
+docker compose -f compose.prod.yaml exec app php artisan db:seed --force
+```
+
+El `.env` del servidor nunca se sube al repositorio y necesita:
+
+- `APP_ENV=production` y `APP_URL=https://<dominio>`.
+- `SERVER_NAME=<dominio>`: el dominio para el que se pide el certificado.
+- `APP_KEY` y `JWT_SECRET`.
+- `DB_USERNAME` y `DB_PASSWORD`: Compose crea ese usuario en MySQL la primera vez.
+- `RATES_SERVICE_TOKEN` y `LOAN_SERVICE_TOKEN`.
+- El bloque `MAIL_*` de Gmail.
+- `SEED_PASSWORD`: en producción las cuentas sembradas usan este valor y no `password123`.
+
+Compose fija por su cuenta `DB_HOST=mysql`, `APP_DEBUG=false` y las URL internas de los microservicios.
+
+Para actualizar producción con el último commit, desde la raíz del repositorio y con la clave SSH de la VM:
+
+```bash
+git archive --format=tar HEAD | ssh -i ~/.ssh/inmoplus_key.pem azureuser@inmoplus.northcentralus.cloudapp.azure.com "tar -x -C ~/inmoplus"
+ssh -i ~/.ssh/inmoplus_key.pem azureuser@inmoplus.northcentralus.cloudapp.azure.com "cd ~/inmoplus && docker compose -f compose.prod.yaml up -d --build"
+```
 
 ## ZIP de entrega académica
 
